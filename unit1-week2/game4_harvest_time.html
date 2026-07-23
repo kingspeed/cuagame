@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>🌽 Mùa Thu Hoạch — Harvest Time 🌽</title>
+<style>
+  :root{
+    --sky-top:#8ecae6;--sky-bottom:#d7f2fa;--soil:#6f4e37;--soil-dark:#4e3423;
+    --sun:#ffd166;--leaf:#4c9a5b;--leaf-dark:#2f6b3d;--card:#fffdf5;--ink:#2b3a2d;
+    --wrong:#e76f51;--right:#2f9e44;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Comic Sans MS','Baloo 2',-apple-system,sans-serif;
+    background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 55%,var(--soil) 55%,var(--soil-dark) 100%);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:var(--ink);overflow-x:hidden;}
+  .sun{position:fixed;top:24px;right:36px;width:70px;height:70px;background:var(--sun);border-radius:50%;
+    box-shadow:0 0 40px 10px rgba(255,209,102,.7);animation:pulse 3s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+  .cloud{position:fixed;background:white;border-radius:50px;opacity:.9;}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:white;border-radius:50%;}
+  .c1{width:90px;height:34px;top:60px;left:8%;}
+  .c1::before{width:50px;height:50px;top:-24px;left:10px;}
+  .c1::after{width:40px;height:40px;top:-16px;left:45px;}
+  .c2{width:70px;height:26px;top:120px;right:20%;}
+  .c2::before{width:36px;height:36px;top:-18px;left:8px;}
+  .c2::after{width:30px;height:30px;top:-12px;left:34px;}
+  .game{position:relative;z-index:2;width:100%;max-width:640px;background:var(--card);
+    border-radius:28px;padding:26px 24px 20px;box-shadow:0 20px 45px rgba(0,0,0,.25);border:4px solid var(--leaf-dark);}
+  h1{text-align:center;color:var(--leaf-dark);font-size:1.45em;margin:0 0 4px;}
+  .sub{text-align:center;color:#6a6a4f;margin-bottom:16px;font-size:.9em;}
+  .legend{text-align:center;font-size:.85em;color:#5a6b52;background:#eef7e6;border-radius:12px;padding:6px 10px;margin-bottom:12px;}
+  .stars{text-align:center;font-size:1.3em;margin-bottom:4px;min-height:30px;}
+  .plantbox{display:flex;justify-content:center;margin-bottom:8px;font-size:1.8em;}
+  #screen-start,#screen-end{text-align:center;}
+  button.big{background:var(--leaf);color:white;border:none;border-radius:20px;padding:14px 28px;
+    font-size:1.1em;font-weight:bold;cursor:pointer;box-shadow:0 6px 0 var(--leaf-dark);transition:transform .08s;}
+  button.big:active{transform:translateY(4px);box-shadow:0 2px 0 var(--leaf-dark);}
+  .qcard{background:#f4f9ec;border:3px dashed var(--leaf);border-radius:20px;padding:16px;margin-bottom:14px;}
+  .qnum{color:#7a8c6a;font-size:.8em;margin-bottom:2px;}
+  .qtype{display:inline-block;background:#dff0d8;color:#2f6b3d;font-size:.72em;border-radius:8px;padding:2px 8px;margin-bottom:6px;}
+  .qtext{font-size:1.2em;font-weight:bold;color:var(--leaf-dark);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .phon{font-size:.55em;color:#a8763d;font-weight:normal;}
+  .speaker{cursor:pointer;background:#ffe066;border:2px solid #e6b800;border-radius:50%;
+    width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:.95em;flex:none;}
+  .viBtn{margin-top:8px;background:#fff0d6;border:2px solid #e6b800;border-radius:12px;padding:6px 12px;font-size:.85em;cursor:pointer;color:#7a5b13;}
+  .viBox{display:none;margin-top:8px;background:#fff8e6;border:2px dashed #e6b800;border-radius:12px;padding:8px 10px;font-size:.88em;color:#5c4400;font-style:italic;}
+  .viBox.show{display:block;}
+  .choices{display:flex;flex-direction:column;gap:9px;margin-top:12px;}
+  .choice{background:white;border:3px solid var(--leaf);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;cursor:pointer;font-size:1em;}
+  .choiceRow{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;}
+  .choice .txt{display:flex;align-items:center;gap:8px;}
+  .choice:hover{background:#eefbe6;}
+  .choice.correct{background:#d3f8d3;border-color:var(--right);}
+  .choice.wrong{background:#ffe0d6;border-color:var(--wrong);}
+  .viIcon{background:#fff0d6;border:2px solid #e6b800;border-radius:50%;width:26px;height:26px;flex:none;
+    display:inline-flex;align-items:center;justify-content:center;font-size:.8em;cursor:pointer;}
+  .choiceViText{display:none;font-size:.82em;color:#5c4400;font-style:italic;margin-top:4px;}
+  .choiceViText.show{display:block;}
+  .tfrow{display:flex;gap:12px;margin-top:12px;}
+  .tfrow .choice{flex:1;justify-content:center;font-size:1.2em;font-weight:bold;align-items:center;}
+  .fillbox{margin-top:12px;display:flex;flex-direction:column;gap:10px;}
+  .fillrow{display:flex;gap:8px;align-items:center;}
+  .fillrow input{flex:1;padding:10px 12px;border:3px solid var(--leaf);border-radius:14px;font-size:1.05em;font-family:inherit;}
+  .fillrow input:disabled{background:#f0f0f0;}
+  .feedback{margin-top:12px;padding:12px;border-radius:14px;font-size:.95em;display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:#e6f9e6;border:2px solid var(--right);color:#1e5c1e;}
+  .feedback.no{background:#fdeae3;border:2px solid var(--wrong);color:#8a2f18;}
+  .nextbtn{margin-top:10px;display:none;}
+  .nextbtn.show{display:inline-block;}
+  #screen-quiz{display:none;}
+  #screen-end{display:none;}
+  .encourage{font-size:1.2em;color:var(--leaf-dark);margin:14px 0;}
+  .footer-note{text-align:center;font-size:.78em;color:#999;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="sun"></div>
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+
+<div class="game">
+  <div id="screen-start">
+    <h1>🌽 Mùa Thu Hoạch — Harvest Time 🌽</h1>
+    <p class="sub">Leveled Reader (Beyond) — Pig, Goose, Dog và Beaver</p>
+    <div style="font-size:3.5em;margin:14px 0;">🐷🦆🐶🦫</div>
+    <button class="big" onclick="startGame()">Bắt đầu chơi 🌱</button>
+    <p class="footer-note">Có trắc nghiệm, đúng/sai và điền từ. Bấm 🇻🇳 để xem nghĩa!</p>
+  </div>
+
+  <div id="screen-quiz">
+    <h1>🌽 Mùa Thu Hoạch — Harvest Time 🌽</h1>
+    <div class="legend">✅ True = Đúng &nbsp;·&nbsp; ❌ False = Sai</div>
+    <div class="stars" id="stars"></div>
+    <div class="plantbox" id="plantbox"></div>
+    <div class="qcard">
+      <div class="qnum" id="qnum"></div>
+      <div class="qtype" id="qtype"></div>
+      <div class="qtext">
+        <span class="speaker" onclick="speak(current.q)">🔊</span>
+        <span id="qen"></span>
+        <span class="phon" id="qphon"></span>
+      </div>
+      <button class="viBtn" id="viToggleBtn" onclick="toggleVi()">🇻🇳 Xem nghĩa tiếng Việt</button>
+      <div class="viBox" id="viBox"></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="big nextbtn" id="nextbtn" onclick="nextQuestion()">Câu tiếp theo ➡️</button>
+    </div>
+  </div>
+
+  <div id="screen-end">
+    <h1>🎉 Hoàn thành! 🎉</h1>
+    <div style="font-size:2.2em;" id="endstars"></div>
+    <p class="encourage" id="endmsg"></p>
+    <button class="big" onclick="startGame()">Chơi lại 🔄</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+{
+"type": "mcq",
+"q": "What time is it on the farm?",
+"phon": "harvest (ha-vợt)",
+"vi": "Đó là thời điểm gì trên nông trại?",
+"choices": [
+{
+"en": "harvest time",
+"vi": "mùa thu hoạch",
+"correct": true
+},
+{
+"en": "bedtime",
+"vi": "giờ đi ngủ",
+"correct": false
+},
+{
+"en": "snack time",
+"vi": "giờ ăn nhẹ",
+"correct": false
+}
+],
+"explain": "'It's harvest time on the farm!' — Đó là mùa thu hoạch."
+},
+{
+"type": "mcq",
+"q": "Who picks the corn?",
+"phon": "corn (co-rn)",
+"vi": "Ai hái bắp?",
+"choices": [
+{
+"en": "Pig",
+"vi": "Lợn",
+"correct": true
+},
+{
+"en": "Goose",
+"vi": "Ngỗng",
+"correct": false
+},
+{
+"en": "Dog",
+"vi": "Chó",
+"correct": false
+}
+],
+"explain": "'I'll pick the corn,' says Pig."
+},
+{
+"type": "mcq",
+"q": "Who picks the pumpkins?",
+"phon": "pumpkins (păm-kin-x)",
+"vi": "Ai hái bí ngô?",
+"choices": [
+{
+"en": "Goose",
+"vi": "Ngỗng",
+"correct": true
+},
+{
+"en": "Pig",
+"vi": "Lợn",
+"correct": false
+},
+{
+"en": "Dog",
+"vi": "Chó",
+"correct": false
+}
+],
+"explain": "'I'll pick the pumpkins,' says Goose."
+},
+{
+"type": "mcq",
+"q": "Who picks the apples?",
+"phon": "apples (e-pồ-x)",
+"vi": "Ai hái táo?",
+"choices": [
+{
+"en": "Dog",
+"vi": "Chó",
+"correct": true
+},
+{
+"en": "Pig",
+"vi": "Lợn",
+"correct": false
+},
+{
+"en": "Goose",
+"vi": "Ngỗng",
+"correct": false
+}
+],
+"explain": "'I'll pick the apples,' says Dog."
+},
+{
+"type": "mcq",
+"q": "Where will the corn, pumpkins, and apples sell well?",
+"phon": "market (ma-kịt)",
+"vi": "Bắp, bí ngô và táo sẽ bán tốt ở đâu?",
+"choices": [
+{
+"en": "at the market",
+"vi": "ở chợ",
+"correct": true
+},
+{
+"en": "at school",
+"vi": "ở trường",
+"correct": false
+},
+{
+"en": "at the zoo",
+"vi": "ở sở thú",
+"correct": false
+}
+],
+"explain": "'It will sell well at the market.'"
+},
+{
+"type": "mcq",
+"q": "What happens when they drive down to the river?",
+"phon": "bridge (brít-x)",
+"vi": "Điều gì xảy ra khi họ lái xe xuống bờ sông?",
+"choices": [
+{
+"en": "the bridge is down",
+"vi": "cây cầu bị sập",
+"correct": true
+},
+{
+"en": "the sun comes up",
+"vi": "mặt trời mọc lên",
+"correct": false
+},
+{
+"en": "they find more apples",
+"vi": "họ tìm thấy thêm táo",
+"correct": false
+}
+],
+"explain": "'Oh, no! The bridge is down,' says Pig."
+},
+{
+"type": "mcq",
+"q": "Who helps Pig, Goose, and Dog cross the river?",
+"phon": "beaver (bi-vơ)",
+"vi": "Ai giúp Lợn, Ngỗng và Chó qua sông?",
+"choices": [
+{
+"en": "Beaver",
+"vi": "Hải ly",
+"correct": true
+},
+{
+"en": "a fish",
+"vi": "một con cá",
+"correct": false
+},
+{
+"en": "a bird",
+"vi": "một con chim",
+"correct": false
+}
+],
+"explain": "'Beaver can help us!' says Dog. Beaver made a new bridge."
+},
+{
+"type": "mcq",
+"q": "How does Beaver help them?",
+"phon": "",
+"vi": "Hải ly giúp họ bằng cách nào?",
+"choices": [
+{
+"en": "Beaver makes a new bridge",
+"vi": "Hải ly làm một cây cầu mới",
+"correct": true
+},
+{
+"en": "Beaver gives them food",
+"vi": "Hải ly cho họ thức ăn",
+"correct": false
+},
+{
+"en": "Beaver drives the cart",
+"vi": "Hải ly lái xe",
+"correct": false
+}
+],
+"explain": "'Beaver makes a new bridge.' — Nhờ vậy họ có thể đến chợ."
+},
+{
+"type": "mcq",
+"q": "What do they load into the cart?",
+"phon": "",
+"vi": "Họ chở gì lên xe kéo?",
+"choices": [
+{
+"en": "apples, pumpkins, and corn",
+"vi": "táo, bí ngô và bắp",
+"correct": true
+},
+{
+"en": "toys and books",
+"vi": "đồ chơi và sách",
+"correct": false
+},
+{
+"en": "rocks and sand",
+"vi": "đá và cát",
+"correct": false
+}
+],
+"explain": "'Pig, Goose, and Dog fill the cart with apples, pumpkins, and corn.'"
+},
+{
+"type": "tf",
+"q": "It's harvest time on the farm.",
+"phon": "",
+"vi": "Đó là mùa thu hoạch trên nông trại.",
+"answer": true,
+"explain": "Đúng! 'It's harvest time on the farm!'"
+},
+{
+"type": "tf",
+"q": "Pig picks the pumpkins.",
+"phon": "",
+"vi": "Lợn hái bí ngô.",
+"answer": false,
+"explain": "Sai! Pig hái BẮP, còn Goose mới hái bí ngô."
+},
+{
+"type": "tf",
+"q": "The bridge is down when they go to the river.",
+"phon": "",
+"vi": "Cây cầu bị sập khi họ đến bờ sông.",
+"answer": true,
+"explain": "Đúng! 'Oh, no! The bridge is down,' says Pig."
+},
+{
+"type": "tf",
+"q": "Beaver cannot help them cross the river.",
+"phon": "",
+"vi": "Hải ly không thể giúp họ qua sông.",
+"answer": false,
+"explain": "Sai! Beaver CÓ THỂ giúp — Beaver làm một cây cầu mới cho họ."
+},
+{
+"type": "tf",
+"q": "After Beaver helps, they can get to the market.",
+"phon": "",
+"vi": "Sau khi Hải ly giúp, họ có thể đến được chợ.",
+"answer": true,
+"explain": "Đúng! 'Now we can get to market,' says Goose."
+},
+{
+"type": "fill",
+"q": "I'll pick the ___,' says Pig.",
+"phon": "corn (co-rn)",
+"vi": "Tôi sẽ hái ___,' Lợn nói.",
+"answer": "corn",
+"answerVi": "bắp",
+"explain": "'I'll pick the corn,' says Pig."
+},
+{
+"type": "fill",
+"q": "I'll pick the ___,' says Goose.",
+"phon": "pumpkins (păm-kin-x)",
+"vi": "Tôi sẽ hái ___,' Ngỗng nói.",
+"answer": "pumpkins",
+"answerVi": "bí ngô",
+"explain": "'I'll pick the pumpkins,' says Goose."
+},
+{
+"type": "fill",
+"q": "Oh, no! The ___ is down,' says Pig.",
+"phon": "bridge (brít-x)",
+"vi": "Ôi không! Cây ___ bị sập,' Lợn nói.",
+"answer": "bridge",
+"answerVi": "cây cầu",
+"explain": "'Oh, no! The bridge is down,' says Pig."
+},
+{
+"type": "fill",
+"q": "___ can help us! says Dog.",
+"phon": "Beaver (bi-vơ)",
+"vi": "___ có thể giúp chúng ta! Chó nói.",
+"answer": "Beaver",
+"answerVi": "Hải ly",
+"explain": "'Beaver can help us!' says Dog."
+},
+{
+"type": "fill",
+"q": "Now we can get to ___,' says Goose.",
+"phon": "market (ma-kịt)",
+"vi": "Giờ chúng ta có thể đến ___,' Ngỗng nói.",
+"answer": "market",
+"answerVi": "chợ",
+"explain": "'Now we can get to market,' says Goose."
+}
+];
+
+let order = [];
+let idx = 0;
+let stars = 0;
+let current = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function speak(text){
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.8;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function startGame(){
+  order = shuffle(QUESTIONS.map((q,i)=>i));
+  idx = 0;
+  stars = 0;
+  document.getElementById('screen-start').style.display='none';
+  document.getElementById('screen-end').style.display='none';
+  document.getElementById('screen-quiz').style.display='block';
+  renderPlant();
+  renderStars();
+  loadQuestion();
+}
+
+function renderStars(){
+  document.getElementById('stars').textContent = "⭐ " + stars + " / " + order.length;
+}
+
+function renderPlant(){
+  const stages = ["🌱","🌱🌿","🌿🌿","🌿🌸","🌷🌿🌸","🌻🌿🌸","🌻🌻🌸🌿","🌳🌸🌻","🌳🌻🌻🌸","🌳🌳🌻🌻🌸"];
+  const pct = order.length ? stars / order.length : 0;
+  const stageIdx = Math.min(Math.floor(pct * (stages.length-1)), stages.length-1);
+  document.getElementById('plantbox').innerHTML = stages[stageIdx];
+}
+
+function toggleVi(){
+  document.getElementById('viBox').classList.toggle('show');
+}
+
+const TYPE_LABEL = {mcq:"🔵 Trắc nghiệm", tf:"✅❌ Đúng / Sai", fill:"✏️ Điền từ"};
+
+function loadQuestion(){
+  if(idx >= order.length){ endGame(); return; }
+  current = QUESTIONS[order[idx]];
+  document.getElementById('qnum').textContent = "Câu " + (idx+1) + " / " + order.length;
+  document.getElementById('qtype').textContent = TYPE_LABEL[current.type];
+  document.getElementById('qen').textContent = current.q;
+  document.getElementById('qphon').textContent = current.phon ? "("+current.phon+")" : "";
+
+  const viBox = document.getElementById('viBox');
+  viBox.textContent = current.vi;
+  viBox.classList.remove('show');
+
+  const feedback = document.getElementById('feedback');
+  feedback.className = "feedback";
+  feedback.textContent = "";
+  document.getElementById('nextbtn').classList.remove('show');
+
+  const box = document.getElementById('choices');
+  box.innerHTML = "";
+
+  if(current.type === "tf"){
+    box.className = "choices tfrow";
+    const trueDiv = document.createElement('div');
+    trueDiv.className = "choice"; trueDiv.innerHTML = "✅ True";
+    trueDiv.onclick = ()=>selectTF(trueDiv, true);
+    const falseDiv = document.createElement('div');
+    falseDiv.className = "choice"; falseDiv.innerHTML = "❌ False";
+    falseDiv.onclick = ()=>selectTF(falseDiv, false);
+    box.appendChild(trueDiv); box.appendChild(falseDiv);
+
+  } else if(current.type === "fill"){
+    box.className = "choices";
+    const wrap = document.createElement('div');
+    wrap.className = "fillbox";
+    wrap.innerHTML =
+      "<div class='fillrow'>"+
+        "<input type='text' id='fillInput' placeholder='Gõ từ tiếng Anh còn thiếu...' autocomplete='off'/>"+
+        "<span class='viIcon' id='fillViIcon' onclick=\"document.getElementById('fillViText').classList.toggle('show')\">🇻🇳</span>"+
+      "</div>"+
+      "<div class='choiceViText' id='fillViText'>Gợi ý nghĩa: "+current.answerVi+"</div>"+
+      "<button class='big' id='checkBtn' onclick='checkFill()'>Kiểm tra ✅</button>";
+    box.appendChild(wrap);
+
+  } else {
+    box.className = "choices";
+    const shuffledChoices = shuffle(current.choices);
+    shuffledChoices.forEach((choice,i)=>{
+      const div = document.createElement('div');
+      div.className = "choice";
+      const safe = choice.en.replace(/"/g,'');
+      div.innerHTML =
+        "<div class='choiceRow'>"+
+          "<span class='txt'><span class='speaker' onclick='event.stopPropagation();speak(\""+safe+"\")'>🔊</span><span>"+choice.en+"</span></span>"+
+          "<span class='viIcon' onclick='event.stopPropagation();this.parentNode.parentNode.querySelector(\".choiceViText\").classList.toggle(\"show\")'>🇻🇳</span>"+
+        "</div>"+
+        "<div class='choiceViText'>"+choice.vi+"</div>";
+      div.onclick = ()=>selectChoice(div, choice);
+      box.appendChild(div);
+    });
+  }
+
+  renderStars();
+  renderPlant();
+}
+
+function selectChoice(el, choice){
+  const all = document.querySelectorAll('.choice');
+  all.forEach(c=>c.onclick=null);
+  const feedback = document.getElementById('feedback');
+  if(choice.correct){
+    el.classList.add('correct');
+    stars++;
+    feedback.className = "feedback show ok";
+    feedback.textContent = "✅ Đúng rồi, bé giỏi quá! " + current.explain;
+  } else {
+    el.classList.add('wrong');
+    const correctEn = current.choices.find(ch=>ch.correct).en;
+    all.forEach(c=>{ if(c.textContent.includes(correctEn)) c.classList.add('correct'); });
+    feedback.className = "feedback show no";
+    feedback.textContent = "❌ Chưa đúng, không sao nhé! " + current.explain;
+  }
+  speak(current.choices.find(ch=>ch.correct).en);
+  renderStars(); renderPlant();
+  document.getElementById('nextbtn').classList.add('show');
+}
+
+function selectTF(el, val){
+  const all = document.querySelectorAll('.choice');
+  all.forEach(c=>c.onclick=null);
+  const feedback = document.getElementById('feedback');
+  const isCorrect = (val === current.answer);
+  if(isCorrect){
+    el.classList.add('correct'); stars++;
+    feedback.className = "feedback show ok";
+    feedback.textContent = "✅ Đúng rồi, bé giỏi quá! " + current.explain;
+  } else {
+    el.classList.add('wrong');
+    feedback.className = "feedback show no";
+    feedback.textContent = "❌ Chưa đúng, không sao nhé! " + current.explain;
+  }
+  speak(current.q);
+  renderStars(); renderPlant();
+  document.getElementById('nextbtn').classList.add('show');
+}
+
+function checkFill(){
+  const input = document.getElementById('fillInput');
+  const val = input.value.trim().toLowerCase();
+  const correctWord = current.answer.toLowerCase();
+  const feedback = document.getElementById('feedback');
+  input.disabled = true;
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('checkBtn').style.display = 'none';
+
+  if(val === correctWord){
+    stars++;
+    feedback.className = "feedback show ok";
+    feedback.textContent = "✅ Đúng rồi, bé giỏi quá! Từ đúng là \""+current.answer+"\". " + current.explain;
+  } else {
+    feedback.className = "feedback show no";
+    feedback.textContent = "❌ Chưa đúng. Từ đúng là \""+current.answer+"\" ("+current.answerVi+"). " + current.explain;
+  }
+  speak(current.answer);
+  renderStars(); renderPlant();
+  document.getElementById('nextbtn').classList.add('show');
+}
+
+function nextQuestion(){
+  idx++;
+  loadQuestion();
+}
+
+function endGame(){
+  document.getElementById('screen-quiz').style.display='none';
+  document.getElementById('screen-end').style.display='block';
+  const ratio = stars/order.length;
+  document.getElementById('endstars').textContent = "⭐".repeat(Math.round(ratio*10));
+  let msg = "";
+  if(ratio === 1){
+    msg = "Xuất sắc! Bé đã trả lời đúng tất cả " + stars + " câu. Bé hiểu bài rất giỏi! 🌟";
+  } else if(ratio >= 0.7){
+    msg = "Giỏi lắm! Bé được " + stars + "/" + order.length + " sao. Ôn thêm chút nữa là hoàn hảo! 🌼";
+  } else {
+    msg = "Bé được " + stars + "/" + order.length + " sao. Cùng chơi lại để nhớ bài thật kỹ nhé! 🌱";
+  }
+  document.getElementById('endmsg').textContent = msg;
+}
+</script>
+</body>
+</html>

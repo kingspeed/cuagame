@@ -1,102 +1,214 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách HTML</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body{
-            font-family: Arial, Helvetica, sans-serif;
-            max-width:900px;
-            margin:40px auto;
-            padding:20px;
-            background:#f5f5f5;
-        }
+<title>Danh sách HTML</title>
 
-        h1{
-            text-align:center;
-        }
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        ul{
-            list-style:none;
-            padding:0;
-        }
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#1b1b1b;
+    color:#fff;
+}
 
-        li{
-            background:white;
-            margin:10px 0;
-            padding:15px;
-            border-radius:8px;
-            box-shadow:0 2px 6px rgba(0,0,0,.1);
-        }
+.container{
+    max-width:900px;
+    margin:40px auto;
+    padding:20px;
+}
 
-        a{
-            text-decoration:none;
-            color:#1565c0;
-            font-size:18px;
-        }
+h1{
+    text-align:center;
+    margin-bottom:25px;
+}
 
-        a:hover{
-            text-decoration:underline;
-        }
+#breadcrumb{
+    margin-bottom:15px;
+    color:#aaa;
+    font-size:14px;
+}
 
-        .path{
-            color:#666;
-            font-size:13px;
-        }
-    </style>
+#breadcrumb span{
+    cursor:pointer;
+    color:#58a6ff;
+}
+
+#breadcrumb span:hover{
+    text-decoration:underline;
+}
+
+.list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.item{
+    background:#222;
+    border-radius:10px;
+    padding:15px;
+    transition:.2s;
+}
+
+.item:hover{
+    background:#2b2b2b;
+}
+
+.item a{
+    color:#58a6ff;
+    text-decoration:none;
+    font-size:18px;
+}
+
+.item a:hover{
+    text-decoration:underline;
+}
+
+.path{
+    color:#999;
+    margin-top:5px;
+    font-size:13px;
+}
+
+.back{
+    cursor:pointer;
+    color:#58a6ff;
+}
+</style>
+
 </head>
+
 <body>
 
-<h1>📄 Danh sách HTML</h1>
+<div class="container">
 
-<ul id="list"></ul>
+<h1>📁 Danh sách HTML</h1>
+
+<div id="breadcrumb"></div>
+
+<div class="list" id="list"></div>
+
+</div>
 
 <script>
 
-const owner = "kingspeed";
-const repo = "cuagame";
-const branch = "main";
+const owner="kingspeed";
+const repo="cuagame";
+const branch="main";
+
+let currentPath="";
+
+function renderBreadcrumb(path){
+
+    const div=document.getElementById("breadcrumb");
+
+    if(path===""){
+        div.innerHTML="<b>Home</b>";
+        return;
+    }
+
+    const parts=path.split("/");
+
+    let html='<span onclick="load(\'\')">Home</span>';
+
+    let p="";
+
+    for(const part of parts){
+
+        p+=(p?"/":"")+part;
+
+        html+=" / ";
+
+        html+=`<span onclick="load('${p}')">${part}</span>`;
+    }
+
+    div.innerHTML=html;
+}
 
 async function load(path=""){
 
-    const url =
+    currentPath=path;
+
+    renderBreadcrumb(path);
+
+    const url=
 `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
 
-    const res = await fetch(url);
+    const res=await fetch(url);
 
-    const data = await res.json();
+    const data=await res.json();
 
-    for(const item of data){
+    const list=document.getElementById("list");
 
-        if(item.type==="dir"){
-            await load(item.path);
-        }
+    list.innerHTML="";
 
-        if(item.type==="file"
-            && item.name.endsWith(".html")
-            && item.name!="index.html"){
+    if(path!=""){
 
-            addItem(item.path);
-        }
+        const parent=path.split("/").slice(0,-1).join("/");
+
+        const back=document.createElement("div");
+
+        back.className="item";
+
+        back.innerHTML='<div class="back">⬅ Quay lại</div>';
+
+        back.onclick=()=>load(parent);
+
+        list.appendChild(back);
     }
-}
 
-function addItem(path){
+    // Folder trước
+    data
+    .filter(i=>i.type==="dir")
+    .sort((a,b)=>a.name.localeCompare(b.name))
+    .forEach(item=>{
 
-    const ul=document.getElementById("list");
+        const div=document.createElement("div");
 
-    const li=document.createElement("li");
+        div.className="item";
 
-    li.innerHTML=`
-        <a href="${path}">
-            ${path.split("/").pop()}
-        </a>
-        <div class="path">${path}</div>
-    `;
+        div.innerHTML=`
+            <a href="#">📁 ${item.name}</a>
+            <div class="path">${item.path}</div>
+        `;
 
-    ul.appendChild(li);
+        div.onclick=()=>load(item.path);
+
+        list.appendChild(div);
+
+    });
+
+    // File sau
+    data
+    .filter(i=>
+        i.type==="file" &&
+        i.name.endsWith(".html") &&
+        i.name!="index.html"
+    )
+    .sort((a,b)=>a.name.localeCompare(b.name))
+    .forEach(item=>{
+
+        const div=document.createElement("div");
+
+        div.className="item";
+
+        div.innerHTML=`
+            <a href="${item.path}">📄 ${item.name}</a>
+            <div class="path">${item.path}</div>
+        `;
+
+        list.appendChild(div);
+
+    });
+
 }
 
 load();
