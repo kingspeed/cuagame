@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Vườn Cây Kỳ Diệu - All About Plants</title>
+<style>
+  :root{
+    --sky-top:#8ecae6;
+    --sky-bottom:#d7f2fa;
+    --soil:#6f4e37;
+    --soil-dark:#4e3423;
+    --sun:#ffd166;
+    --leaf:#4c9a5b;
+    --leaf-dark:#2f6b3d;
+    --card:#fffdf5;
+    --ink:#2b3a2d;
+    --wrong:#e76f51;
+    --right:#2f9e44;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Comic Sans MS','Baloo 2',-apple-system,sans-serif;
+    background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 55%,var(--soil) 55%,var(--soil-dark) 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  .sun{position:fixed;top:24px;right:36px;width:70px;height:70px;background:var(--sun);border-radius:50%;
+    box-shadow:0 0 40px 10px rgba(255,209,102,.7);animation:pulse 3s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+  .cloud{position:fixed;background:white;border-radius:50px;opacity:.9;}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:white;border-radius:50%;}
+  .c1{width:90px;height:34px;top:60px;left:8%;}
+  .c1::before{width:50px;height:50px;top:-24px;left:10px;}
+  .c1::after{width:40px;height:40px;top:-16px;left:45px;}
+  .c2{width:70px;height:26px;top:120px;right:20%;}
+  .c2::before{width:36px;height:36px;top:-18px;left:8px;}
+  .c2::after{width:30px;height:30px;top:-12px;left:34px;}
+
+  .game{position:relative;z-index:2;width:100%;max-width:640px;background:var(--card);
+    border-radius:28px;padding:26px 24px 20px;box-shadow:0 20px 45px rgba(0,0,0,.25);border:4px solid var(--leaf-dark);}
+  h1{text-align:center;color:var(--leaf-dark);font-size:1.6em;margin:0 0 4px;}
+  .sub{text-align:center;color:#6a6a4f;margin-bottom:16px;font-size:.9em;}
+  .legend{
+    text-align:center;font-size:.85em;color:#5a6b52;background:#eef7e6;
+    border-radius:12px;padding:6px 10px;margin-bottom:12px;
+  }
+  .stars{text-align:center;font-size:1.3em;margin-bottom:4px;min-height:30px;}
+  .plantbox{display:flex;justify-content:center;margin-bottom:8px;font-size:1.8em;}
+  #screen-start,#screen-end{text-align:center;}
+  button.big{background:var(--leaf);color:white;border:none;border-radius:20px;padding:14px 28px;
+    font-size:1.1em;font-weight:bold;cursor:pointer;box-shadow:0 6px 0 var(--leaf-dark);transition:transform .08s;}
+  button.big:active{transform:translateY(4px);box-shadow:0 2px 0 var(--leaf-dark);}
+  .qcard{background:#f4f9ec;border:3px dashed var(--leaf);border-radius:20px;padding:16px;margin-bottom:14px;}
+  .qnum{color:#7a8c6a;font-size:.82em;margin-bottom:4px;}
+  .qtext{font-size:1.25em;font-weight:bold;color:var(--leaf-dark);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .phon{font-size:.55em;color:#a8763d;font-weight:normal;}
+  .speaker{cursor:pointer;background:#ffe066;border:2px solid #e6b800;border-radius:50%;
+    width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:.95em;flex:none;}
+  .viBtn{
+    margin-top:8px;
+    background:#fff0d6;border:2px solid #e6b800;border-radius:12px;
+    padding:6px 12px;font-size:.85em;cursor:pointer;color:#7a5b13;
+  }
+  .viBox{
+    display:none;margin-top:8px;background:#fff8e6;border:2px dashed #e6b800;
+    border-radius:12px;padding:8px 10px;font-size:.88em;color:#5c4400;font-style:italic;
+  }
+  .viBox.show{display:block;}
+  .choices{display:flex;flex-direction:column;gap:9px;margin-top:12px;}
+  .choice{background:white;border:3px solid var(--leaf);border-radius:14px;padding:10px 12px;
+    display:flex;flex-direction:column;cursor:pointer;font-size:1em;}
+  .choiceRow{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;}
+  .choice .txt{display:flex;align-items:center;gap:8px;}
+  .choice:hover{background:#eefbe6;}
+  .choice.correct{background:#d3f8d3;border-color:var(--right);}
+  .choice.wrong{background:#ffe0d6;border-color:var(--wrong);}
+  .viIcon{
+    background:#fff0d6;border:2px solid #e6b800;border-radius:50%;
+    width:26px;height:26px;flex:none;display:inline-flex;align-items:center;justify-content:center;
+    font-size:.8em;cursor:pointer;
+  }
+  .choiceViText{
+    display:none;font-size:.82em;color:#5c4400;font-style:italic;margin-top:4px;
+  }
+  .choiceViText.show{display:block;}
+  .tfrow{display:flex;gap:12px;margin-top:12px;}
+  .tfrow .choice{flex:1;justify-content:center;font-size:1.2em;font-weight:bold;}
+  .feedback{margin-top:12px;padding:12px;border-radius:14px;font-size:.95em;display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:#e6f9e6;border:2px solid var(--right);color:#1e5c1e;}
+  .feedback.no{background:#fdeae3;border:2px solid var(--wrong);color:#8a2f18;}
+  .nextbtn{margin-top:10px;display:none;}
+  .nextbtn.show{display:inline-block;}
+  #screen-quiz{display:none;}
+  #screen-end{display:none;}
+  .encourage{font-size:1.2em;color:var(--leaf-dark);margin:14px 0;}
+  .footer-note{text-align:center;font-size:.78em;color:#999;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="sun"></div>
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+
+<div class="game">
+
+  <div id="screen-start">
+    <h1>🌻 Vườn Cây Kỳ Diệu 🌻</h1>
+    <p class="sub">50 câu hỏi vui về bài "All About Plants"!</p>
+    <div style="font-size:3.5em;margin:14px 0;">🌱🌿🌼</div>
+    <button class="big" onclick="startGame()">Bắt đầu chơi 🌱</button>
+    <p class="footer-note">Bé đọc và đoán tiếng Anh trước nhé — muốn xem nghĩa tiếng Việt thì bấm nút 🇻🇳</p>
+  </div>
+
+  <div id="screen-quiz">
+    <h1>🌻 Vườn Cây Kỳ Diệu 🌻</h1>
+    <div class="legend">✅ True = Đúng &nbsp;·&nbsp; ❌ False = Sai</div>
+    <div class="stars" id="stars"></div>
+    <div class="plantbox" id="plantbox"></div>
+    <div class="qcard">
+      <div class="qnum" id="qnum"></div>
+      <div class="qtext">
+        <span class="speaker" onclick="speak(current.q)">🔊</span>
+        <span id="qen"></span>
+        <span class="phon" id="qphon"></span>
+      </div>
+      <button class="viBtn" id="viToggleBtn" onclick="toggleVi()">🇻🇳 Xem nghĩa tiếng Việt</button>
+      <div class="viBox" id="viBox"></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="big nextbtn" id="nextbtn" onclick="nextQuestion()">Câu tiếp theo ➡️</button>
+    </div>
+  </div>
+
+  <div id="screen-end">
+    <h1>🎉 Hoàn thành! 🎉</h1>
+    <div style="font-size:2.2em;" id="endstars"></div>
+    <p class="encourage" id="endmsg"></p>
+    <button class="big" onclick="startGame()">Chơi lại 🔄</button>
+  </div>
+
+</div>
+
+<script>
+// ---------- Dữ liệu 50 câu hỏi (dựa đúng nội dung bài All About Plants - Scott Foresman Science) ----------
+const QUESTIONS = [
+{type:"mcq",q:"Plants need water, air, and ___ to grow.",phon:"sunlight (xăn-lai-t)",vi:"Cây cần nước, không khí và ___ để lớn.",
+ choices:[{en:"sunlight",vi:"ánh nắng",correct:true},{en:"toys",vi:"đồ chơi",correct:false},{en:"music",vi:"âm nhạc",correct:false}],
+ explain:"'Plants need water, air, and sunlight to grow.' — Cây cần nước, không khí, ánh nắng để lớn."},
+{type:"tf",q:"Plants need water, air, and sunlight to grow.",phon:"",vi:"Cây cần nước, không khí và ánh nắng để lớn.",answer:true,
+ explain:"Đúng! Sách nói rõ cây cần 3 thứ đó để phát triển."},
+{type:"mcq",q:"Where do plants get nutrients from?",phon:"nutrients (niu-tri-ần-tx)",vi:"Cây lấy chất dinh dưỡng từ đâu?",
+ choices:[{en:"the soil",vi:"đất",correct:true},{en:"the sky",vi:"bầu trời",correct:false},{en:"the sea",vi:"biển",correct:false}],
+ explain:"'They need nutrients from the soil.' — Cây lấy chất dinh dưỡng từ đất."},
+{type:"tf",q:"Nutrients help plants grow.",phon:"",vi:"Chất dinh dưỡng giúp cây phát triển.",answer:true,
+ explain:"Đúng! Nutrients (chất dinh dưỡng) giúp cây lớn khỏe."},
+{type:"mcq",q:"How many main parts does a plant have?",phon:"four (pho)",vi:"Cây có mấy bộ phận chính?",
+ choices:[{en:"four",vi:"bốn",correct:true},{en:"two",vi:"hai",correct:false},{en:"ten",vi:"mười",correct:false}],
+ explain:"'A plant has four main parts: roots, stem, leaves, and flowers.' — Cây có 4 bộ phận chính."},
+{type:"mcq",q:"Which of these is a main part of a plant?",phon:"",vi:"Cái nào dưới đây là một bộ phận chính của cây?",
+ choices:[{en:"stem",vi:"thân cây",correct:true},{en:"rock",vi:"hòn đá",correct:false},{en:"cloud",vi:"đám mây",correct:false}],
+ explain:"Thân cây (stem) là một trong 4 bộ phận chính của cây: roots, stem, leaves, flowers."},
+{type:"tf",q:"A plant has four main parts: roots, stem, leaves, and flowers.",phon:"",vi:"Cây có 4 bộ phận chính: rễ, thân, lá và hoa.",answer:true,
+ explain:"Đúng! Đây là 4 bộ phận chính của một cây."},
+{type:"mcq",q:"Roots grow ___ into the soil.",phon:"down (đao-n)",vi:"Rễ mọc ___ vào trong đất.",
+ choices:[{en:"down",vi:"xuống",correct:true},{en:"up",vi:"lên",correct:false},{en:"sideways",vi:"sang ngang",correct:false}],
+ explain:"'A plant's roots grow down into the soil.' — Rễ cây mọc xuống đất."},
+{type:"tf",q:"Roots grow up into the air.",phon:"",vi:"Rễ cây mọc lên trên không trung.",answer:false,
+ explain:"Sai! Rễ cây mọc XUỐNG đất, không mọc lên không trung."},
+{type:"mcq",q:"What do roots do for the plant?",phon:"roots (rút-x)",vi:"Rễ cây có nhiệm vụ gì?",
+ choices:[{en:"hold the plant in place",vi:"giữ cây đứng vững",correct:true},{en:"make flowers",vi:"tạo ra hoa",correct:false},{en:"fly in the wind",vi:"bay theo gió",correct:false}],
+ explain:"'They hold the plant in place.' — Rễ giữ cho cây đứng vững trong đất."},
+{type:"mcq",q:"Stems and leaves seek ___ as they grow.",phon:"light (lai-t)",vi:"Thân và lá tìm ___ khi chúng lớn lên.",
+ choices:[{en:"light",vi:"ánh sáng",correct:true},{en:"water only",vi:"chỉ nước",correct:false},{en:"darkness",vi:"bóng tối",correct:false}],
+ explain:"'Stems and leaves seek light as they grow.' — Thân và lá luôn hướng về phía ánh sáng."},
+{type:"tf",q:"Stems and leaves seek light as they grow.",phon:"",vi:"Thân và lá tìm ánh sáng khi chúng lớn lên.",answer:true,
+ explain:"Đúng! Cây luôn hướng về phía có ánh sáng."},
+{type:"mcq",q:"What do roots take in from the soil?",phon:"",vi:"Rễ hút gì từ trong đất?",
+ choices:[{en:"water and nutrients",vi:"nước và chất dinh dưỡng",correct:true},{en:"toys",vi:"đồ chơi",correct:false},{en:"sand only",vi:"chỉ có cát",correct:false}],
+ explain:"'Roots take in water from the soil. Roots also take in nutrients.' — Rễ hút nước và chất dinh dưỡng."},
+{type:"tf",q:"Roots carry water and nutrients to the stem.",phon:"",vi:"Rễ mang nước và chất dinh dưỡng lên thân cây.",answer:true,
+ explain:"Đúng! Rễ vận chuyển nước và dinh dưỡng lên thân cây."},
+{type:"mcq",q:"What does the stem do?",phon:"stem (xờ-tem)",vi:"Thân cây làm nhiệm vụ gì?",
+ choices:[{en:"holds up the plant and carries water",vi:"đỡ cây và mang nước",correct:true},{en:"makes seeds",vi:"tạo ra hạt",correct:false},{en:"flies away",vi:"bay đi",correct:false}],
+ explain:"'The stem holds up the plant. It carries water and nutrients to the leaves.'"},
+{type:"tf",q:"The stem carries water and nutrients to the leaves.",phon:"",vi:"Thân cây mang nước và chất dinh dưỡng lên lá.",answer:true,
+ explain:"Đúng! Đây chính là định nghĩa của 'stem' trong bảng từ vựng."},
+{type:"mcq",q:"Which parts of a plant grow up?",phon:"",vi:"Những bộ phận nào của cây mọc lên trên?",
+ choices:[{en:"stems, leaves, and flowers",vi:"thân, lá và hoa",correct:true},{en:"only roots",vi:"chỉ có rễ",correct:false},{en:"nothing grows up",vi:"không có gì mọc lên",correct:false}],
+ explain:"'Roots grow down. Stems, leaves, and flowers grow up.'"},
+{type:"tf",q:"Stems, leaves, and flowers grow down into the soil.",phon:"",vi:"Thân, lá và hoa mọc xuống đất.",answer:false,
+ explain:"Sai! Thân, lá và hoa mọc LÊN TRÊN, chỉ có rễ mọc xuống."},
+{type:"mcq",q:"Leaves make food using air, water, and ___.",phon:"energy from light",vi:"Lá làm ra thức ăn nhờ không khí, nước và ___.",
+ choices:[{en:"energy from light",vi:"năng lượng từ ánh sáng",correct:true},{en:"sand",vi:"cát",correct:false},{en:"plastic",vi:"nhựa",correct:false}],
+ explain:"'Green leaves make food using air, water, and energy from light.'"},
+{type:"tf",q:"Leaves make food for the plant.",phon:"",vi:"Lá làm ra thức ăn cho cây.",answer:true,
+ explain:"Đúng! Lá xanh làm ra thức ăn cho cây bằng cách quang hợp."},
+{type:"mcq",q:"What do flowers make?",phon:"seeds (xịt-x)",vi:"Hoa tạo ra cái gì?",
+ choices:[{en:"seeds",vi:"hạt giống",correct:true},{en:"roots",vi:"rễ",correct:false},{en:"soil",vi:"đất",correct:false}],
+ explain:"'Flowers make seeds. Seeds can grow into new plants.'"},
+{type:"tf",q:"Seeds can grow into new plants.",phon:"",vi:"Hạt có thể lớn thành cây mới.",answer:true,
+ explain:"Đúng! Đây là cách cây con mới được sinh ra."},
+{type:"mcq",q:"What do plants need the right amount of, to stay healthy?",phon:"",vi:"Cây cần lượng vừa đủ của cái gì để khỏe mạnh?",
+ choices:[{en:"sunlight and water",vi:"ánh nắng và nước",correct:true},{en:"toys and books",vi:"đồ chơi và sách",correct:false},{en:"paint",vi:"sơn",correct:false}],
+ explain:"'Plants need the right amount of sunlight and water to grow and stay healthy.'"},
+{type:"tf",q:"Plants need the right temperature to grow well.",phon:"",vi:"Cây cần nhiệt độ phù hợp để phát triển tốt.",answer:true,
+ explain:"Đúng! Sách nói: 'Plants also need the right temperatures.'"},
+{type:"tf",q:"Without enough water, plants can die.",phon:"",vi:"Nếu không đủ nước, cây có thể chết.",answer:true,
+ explain:"Đúng! Thiếu nước cây sẽ héo và có thể chết."},
+{type:"mcq",q:"What happens if a plant does not get enough water?",phon:"",vi:"Điều gì xảy ra nếu cây không được tưới đủ nước?",
+ choices:[{en:"it can die",vi:"cây có thể chết",correct:true},{en:"it grows faster",vi:"cây lớn nhanh hơn",correct:false},{en:"it turns blue",vi:"cây chuyển màu xanh dương",correct:false}],
+ explain:"'Without enough water, plants can die.'"},
+{type:"mcq",q:"What can change how plants grow?",phon:"wind (guynh)",vi:"Cái gì có thể làm thay đổi cách cây mọc?",
+ choices:[{en:"wind",vi:"gió",correct:true},{en:"a book",vi:"quyển sách",correct:false},{en:"a chair",vi:"cái ghế",correct:false}],
+ explain:"'Wind can change how plants grow.'"},
+{type:"tf",q:"Vines grow along the ground.",phon:"",vi:"Dây leo mọc bò dọc theo mặt đất.",answer:true,
+ explain:"Đúng! 'Vines grow along the ground.'"},
+{type:"mcq",q:"What happens when a vine touches another plant?",phon:"",vi:"Điều gì xảy ra khi dây leo chạm vào cây khác?",
+ choices:[{en:"it changes how it grows",vi:"nó thay đổi cách mọc",correct:true},{en:"it dies right away",vi:"nó chết ngay lập tức",correct:false},{en:"nothing happens",vi:"không có gì xảy ra",correct:false}],
+ explain:"'They change how they grow when they touch another plant.'"},
+{type:"tf",q:"Some soil lacks enough nutrients, and this can cause plants to grow poorly.",phon:"",vi:"Một số loại đất thiếu chất dinh dưỡng, khiến cây mọc kém.",answer:true,
+ explain:"Đúng! Đất thiếu dinh dưỡng làm cây phát triển không tốt."},
+{type:"mcq",q:"What can cause a plant to grow poorly?",phon:"",vi:"Điều gì có thể khiến cây mọc kém?",
+ choices:[{en:"soil without enough nutrients",vi:"đất thiếu chất dinh dưỡng",correct:true},{en:"too much sunshine only",vi:"chỉ vì quá nhiều nắng",correct:false},{en:"a new pot",vi:"một cái chậu mới",correct:false}],
+ explain:"'Some soil lacks enough nutrients. This can cause plants to grow poorly.'"},
+{type:"mcq",q:"What is a flower's outside part called?",phon:"petal (pét-tồ)",vi:"Bộ phận bên ngoài của hoa được gọi là gì?",
+ choices:[{en:"petal",vi:"cánh hoa",correct:true},{en:"root",vi:"rễ",correct:false},{en:"soil",vi:"đất",correct:false}],
+ explain:"'A flower's outside part is the petal.'"},
+{type:"tf",q:"A flower's outside part is called the petal.",phon:"",vi:"Bộ phận bên ngoài của hoa gọi là cánh hoa.",answer:true,
+ explain:"Đúng! Petal là cánh hoa."},
+{type:"mcq",q:"What helps seeds grow inside flowers?",phon:"pollen (pol-lần)",vi:"Cái gì giúp hạt phát triển bên trong hoa?",
+ choices:[{en:"pollen",vi:"phấn hoa",correct:true},{en:"rocks",vi:"đá",correct:false},{en:"paint",vi:"sơn",correct:false}],
+ explain:"'The petal's powder is pollen. Pollen helps seeds grow inside flowers.'"},
+{type:"tf",q:"Pollen is a powder found in flowers.",phon:"",vi:"Phấn hoa là một loại bột có trong hoa.",answer:true,
+ explain:"Đúng! Đây là định nghĩa của 'pollen' trong bảng từ vựng."},
+{type:"mcq",q:"What protects the seeds?",phon:"fruit (phờ-rút)",vi:"Cái gì bảo vệ hạt giống?",
+ choices:[{en:"fruit",vi:"quả/trái cây",correct:true},{en:"leaves only",vi:"chỉ có lá",correct:false},{en:"wind",vi:"gió",correct:false}],
+ explain:"'Fruit grows around the seeds. It protects the seeds.'"},
+{type:"tf",q:"Fruit grows around the seeds to protect them.",phon:"",vi:"Quả mọc bao quanh hạt để bảo vệ hạt.",answer:true,
+ explain:"Đúng! Quả bao bọc và bảo vệ hạt bên trong."},
+{type:"mcq",q:"Which fruits grow seeds, according to the book?",phon:"",vi:"Theo sách, loại quả nào có hạt?",
+ choices:[{en:"oranges and apples",vi:"cam và táo",correct:true},{en:"rocks and sand",vi:"đá và cát",correct:false},{en:"chairs and tables",vi:"ghế và bàn",correct:false}],
+ explain:"'Oranges and apples grow seeds.'"},
+{type:"tf",q:"Oranges and apples grow seeds.",phon:"",vi:"Cam và táo có hạt.",answer:true,
+ explain:"Đúng! Đây là ví dụ trong sách về quả có hạt."},
+{type:"mcq",q:"What is a seed coat?",phon:"seed coat (xịt-cột)",vi:"Seed coat (vỏ hạt) là gì?",
+ choices:[{en:"the hard outer cover of a seed",vi:"lớp vỏ cứng bên ngoài hạt",correct:true},{en:"a green leaf",vi:"một chiếc lá xanh",correct:false},{en:"a type of soil",vi:"một loại đất",correct:false}],
+ explain:"'The hard outside cover of a seed is called a seed coat.'"},
+{type:"tf",q:"A seed coat is soft and squishy.",phon:"",vi:"Vỏ hạt mềm và nhũn.",answer:false,
+ explain:"Sai! Vỏ hạt (seed coat) là lớp vỏ CỨNG bên ngoài hạt, không mềm."},
+{type:"mcq",q:"What is inside each seed?",phon:"",vi:"Bên trong mỗi hạt có gì?",
+ choices:[{en:"a tiny plant",vi:"một cây con tí hon",correct:true},{en:"water only",vi:"chỉ có nước",correct:false},{en:"nothing",vi:"không có gì",correct:false}],
+ explain:"'Inside each seed is a tiny plant.'"},
+{type:"tf",q:"Food is stored around the new plant inside a seed.",phon:"",vi:"Thức ăn được dự trữ quanh cây con bên trong hạt.",answer:true,
+ explain:"Đúng! Hạt dự trữ thức ăn để nuôi cây con khi nảy mầm."},
+{type:"mcq",q:"Which word means \"begin to grow\"?",phon:"germinate (chơ-mờ-nết)",vi:"Từ nào có nghĩa là \"bắt đầu mọc\"?",
+ choices:[{en:"germinate",vi:"nảy mầm",correct:true},{en:"sleep",vi:"ngủ",correct:false},{en:"jump",vi:"nhảy",correct:false}],
+ explain:"Glossary: 'germinate = begin to grow' — nảy mầm nghĩa là bắt đầu mọc."},
+{type:"tf",q:"Germinate means to stop growing.",phon:"",vi:"Germinate nghĩa là ngừng phát triển.",answer:false,
+ explain:"Sai! Germinate nghĩa là BẮT ĐẦU mọc, không phải ngừng lại."},
+{type:"mcq",q:"A peach seed can germinate if it gets enough water and ___.",phon:"air (e-ơ)",vi:"Hạt đào có thể nảy mầm nếu có đủ nước và ___.",
+ choices:[{en:"air",vi:"không khí",correct:true},{en:"paint",vi:"sơn",correct:false},{en:"sound",vi:"âm thanh",correct:false}],
+ explain:"'If it gets enough water and air, it can germinate, or begin to grow.'"},
+{type:"tf",q:"A peach seed needs water and air to germinate.",phon:"",vi:"Hạt đào cần nước và không khí để nảy mầm.",answer:true,
+ explain:"Đúng! Đây là bước đầu trong vòng đời cây đào."},
+{type:"mcq",q:"Where do peach seeds come from?",phon:"",vi:"Hạt đào đến từ đâu?",
+ choices:[{en:"a fruit",vi:"một quả",correct:true},{en:"a rock",vi:"một hòn đá",correct:false},{en:"the sky",vi:"bầu trời",correct:false}],
+ explain:"'Peach seeds come from a fruit.'"},
+{type:"tf",q:"Peach seeds come from a fruit.",phon:"",vi:"Hạt đào đến từ một quả đào.",answer:true,
+ explain:"Đúng! Hạt nằm bên trong quả đào."},
+{type:"mcq",q:"A seedling is...",phon:"seedling (xịt-linh)",vi:"Seedling (cây con) là...",
+ choices:[{en:"a young plant",vi:"một cây non",correct:true},{en:"an old tree",vi:"một cây già",correct:false},{en:"a flower petal",vi:"một cánh hoa",correct:false}],
+ explain:"Glossary: 'seedling = a young plant.'"},
+{type:"tf",q:"A seedling will change into an adult peach tree.",phon:"",vi:"Cây con sẽ lớn thành cây đào trưởng thành.",answer:true,
+ explain:"Đúng! 'The seedling will grow. It will change into an adult peach tree.'"},
+{type:"mcq",q:"What grows into a peach tree with flowers?",phon:"",vi:"Cái gì lớn lên thành cây đào có hoa?",
+ choices:[{en:"the seedling",vi:"cây con",correct:true},{en:"the seed coat",vi:"vỏ hạt",correct:false},{en:"the pollen",vi:"phấn hoa",correct:false}],
+ explain:"'The seedling grows into a peach tree with flowers.'"},
+{type:"tf",q:"The tree's peach seeds can grow into new trees.",phon:"",vi:"Hạt đào của cây có thể lớn thành cây mới.",answer:true,
+ explain:"Đúng! Đây là bước cuối trong vòng đời — hạt mới lại tạo ra cây mới."}
+];
+
+let order = [];
+let idx = 0;
+let stars = 0;
+let current = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function speak(text){
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.8;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function startGame(){
+  order = shuffle(QUESTIONS.map((q,i)=>i));
+  idx = 0;
+  stars = 0;
+  document.getElementById('screen-start').style.display='none';
+  document.getElementById('screen-end').style.display='none';
+  document.getElementById('screen-quiz').style.display='block';
+  renderPlant();
+  renderStars();
+  loadQuestion();
+}
+
+function renderStars(){
+  document.getElementById('stars').textContent = "⭐ " + stars + " / " + order.length;
+}
+
+function renderPlant(){
+  const stages = ["🌱","🌱🌿","🌿🌿","🌿🌸","🌷🌿🌸","🌻🌿🌸","🌻🌻🌸🌿","🌳🌸🌻","🌳🌻🌻🌸","🌳🌳🌻🌻🌸"];
+  const pct = order.length ? stars / order.length : 0;
+  const stageIdx = Math.min(Math.floor(pct * (stages.length-1)), stages.length-1);
+  document.getElementById('plantbox').innerHTML = stages[stageIdx];
+}
+
+function toggleVi(){
+  const box = document.getElementById('viBox');
+  box.classList.toggle('show');
+}
+
+function loadQuestion(){
+  if(idx >= order.length){
+    endGame();
+    return;
+  }
+  current = QUESTIONS[order[idx]];
+  document.getElementById('qnum').textContent = "Câu " + (idx+1) + " / " + order.length;
+  document.getElementById('qen').textContent = current.q;
+  document.getElementById('qphon').textContent = current.phon ? "("+current.phon+")" : "";
+
+  const viBox = document.getElementById('viBox');
+  viBox.textContent = current.vi;
+  viBox.classList.remove('show');
+
+  const feedback = document.getElementById('feedback');
+  feedback.className = "feedback";
+  feedback.textContent = "";
+  document.getElementById('nextbtn').classList.remove('show');
+
+  const box = document.getElementById('choices');
+  box.innerHTML = "";
+
+  if(current.type === "tf"){
+    box.className = "choices tfrow";
+    const trueDiv = document.createElement('div');
+    trueDiv.className = "choice";
+    trueDiv.innerHTML = "✅ True";
+    trueDiv.onclick = ()=>selectTF(trueDiv, true);
+    const falseDiv = document.createElement('div');
+    falseDiv.className = "choice";
+    falseDiv.innerHTML = "❌ False";
+    falseDiv.onclick = ()=>selectTF(falseDiv, false);
+    box.appendChild(trueDiv);
+    box.appendChild(falseDiv);
+  } else {
+    box.className = "choices";
+    const shuffledChoices = shuffle(current.choices);
+    shuffledChoices.forEach((choice,i)=>{
+      const div = document.createElement('div');
+      div.className = "choice";
+      const safe = choice.en.replace(/"/g,'');
+      const viId = "choiceVi_"+i;
+      div.innerHTML =
+        "<div class='choiceRow'>"+
+          "<span class='txt'><span class='speaker' onclick='event.stopPropagation();speak(\""+safe+"\")'>🔊</span><span>"+choice.en+"</span></span>"+
+          "<span class='viIcon' onclick='event.stopPropagation();this.parentNode.parentNode.querySelector(\".choiceViText\").classList.toggle(\"show\")'>🇻🇳</span>"+
+        "</div>"+
+        "<div class='choiceViText' id='"+viId+"'>"+choice.vi+"</div>";
+      div.onclick = ()=>selectChoice(div, choice);
+      box.appendChild(div);
+    });
+  }
+
+  renderStars();
+  renderPlant();
+}
+
+function selectChoice(el, choice){
+  const all = document.querySelectorAll('.choice');
+  all.forEach(c=>c.onclick=null);
+  const feedback = document.getElementById('feedback');
+  if(choice.correct){
+    el.classList.add('correct');
+    stars++;
+    feedback.className = "feedback show ok";
+    feedback.textContent = "✅ Đúng rồi, bé giỏi quá! " + current.explain;
+  } else {
+    el.classList.add('wrong');
+    const correctEn = current.choices.find(ch=>ch.correct).en;
+    all.forEach(c=>{ if(c.textContent.includes(correctEn)) c.classList.add('correct'); });
+    feedback.className = "feedback show no";
+    feedback.textContent = "❌ Chưa đúng, không sao nhé! " + current.explain;
+  }
+  speak(current.choices.find(ch=>ch.correct).en);
+  renderStars();
+  renderPlant();
+  document.getElementById('nextbtn').classList.add('show');
+}
+
+function selectTF(el, val){
+  const all = document.querySelectorAll('.choice');
+  all.forEach(c=>c.onclick=null);
+  const feedback = document.getElementById('feedback');
+  const isCorrect = (val === current.answer);
+  if(isCorrect){
+    el.classList.add('correct');
+    stars++;
+    feedback.className = "feedback show ok";
+    feedback.textContent = "✅ Đúng rồi, bé giỏi quá! " + current.explain;
+  } else {
+    el.classList.add('wrong');
+    feedback.className = "feedback show no";
+    feedback.textContent = "❌ Chưa đúng, không sao nhé! " + current.explain;
+  }
+  speak(current.q);
+  renderStars();
+  renderPlant();
+  document.getElementById('nextbtn').classList.add('show');
+}
+
+function nextQuestion(){
+  idx++;
+  loadQuestion();
+}
+
+function endGame(){
+  document.getElementById('screen-quiz').style.display='none';
+  document.getElementById('screen-end').style.display='block';
+  const ratio = stars/order.length;
+  document.getElementById('endstars').textContent = "⭐".repeat(Math.round(ratio*10));
+  let msg = "";
+  if(ratio === 1){
+    msg = "Xuất sắc! Bé đã trả lời đúng tất cả " + stars + " câu. Bé hiểu bài rất giỏi! 🌟";
+  } else if(ratio >= 0.7){
+    msg = "Giỏi lắm! Bé được " + stars + "/" + order.length + " sao. Ôn thêm chút nữa là hoàn hảo! 🌼";
+  } else {
+    msg = "Bé được " + stars + "/" + order.length + " sao. Cùng chơi lại để nhớ bài thật kỹ nhé! 🌱";
+  }
+  document.getElementById('endmsg').textContent = msg;
+}
+</script>
+</body>
+</html>
