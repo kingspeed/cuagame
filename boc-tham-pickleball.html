@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bốc thăm – Giải Pickleball Đôi Nam</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh; font-family: "Helvetica Neue", Arial, sans-serif; color: #fff;
+    background: radial-gradient(circle at 50% 0%, #1e5bd8 0%, #0b2a7a 45%, #061a52 100%);
+    padding: 24px 16px 48px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 { text-align: center; font-size: clamp(28px, 4.2vw, 48px); font-weight: 900; text-shadow: 0 4px 0 #062063; }
+  h1 .y { color: #ffe14d; }
+  .sub { text-align: center; margin-top: 6px; color: #9fd4ff; font-weight: 700; letter-spacing: 2px; }
+  .card { background: rgba(10,40,120,.85); border: 2px solid #3fa0ff; border-radius: 20px; padding: 22px; margin-top: 22px; }
+  .hd { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .tag { background: #ffe14d; color: #0b2160; font-weight: 900; font-size: 20px; padding: 6px 16px; border-radius: 10px; }
+  .ttl { font-size: 26px; font-weight: 900; }
+  .ttl small { display: block; font-size: 15px; font-weight: 500; color: #9fd4ff; margin-top: 2px; }
+  .inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+  .inputs input {
+    width: 100%; padding: 12px 14px; font-size: 18px; font-weight: 700; border-radius: 10px;
+    border: 2px solid #5fa8ff; background: #0e3290; color: #fff; outline: none;
+  }
+  .inputs input::placeholder { color: #7f9ccc; }
+  .inputs input:disabled { opacity: .7; }
+  button {
+    margin-top: 16px; padding: 14px 28px; font-size: 20px; font-weight: 900; border: none; border-radius: 40px;
+    cursor: pointer; color: #fff; background: linear-gradient(90deg, #ff7a18, #ff4d00); box-shadow: 0 5px 0 #a13000;
+  }
+  button:active { transform: translateY(3px); box-shadow: 0 2px 0 #a13000; }
+  button:disabled { background: #4a5c85; box-shadow: none; cursor: not-allowed; }
+  button.ghost { background: transparent; border: 2px solid #9fd4ff; box-shadow: none; font-size: 16px; padding: 10px 20px; }
+  .err { color: #ff8a80; font-weight: 700; margin-top: 10px; min-height: 20px; }
+  .order { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 18px; }
+  .slot {
+    background: #fff; color: #0b2160; border-radius: 14px; text-align: center; padding: 14px 6px;
+    min-height: 104px; display: flex; flex-direction: column; justify-content: center;
+  }
+  .slot .n { font-size: 15px; font-weight: 800; color: #1747b8; }
+  .slot .p { font-size: 22px; font-weight: 900; margin-top: 6px; word-break: break-word; }
+  .slot.rolling .p { color: #8aa0c8; }
+  .slot.done { animation: pop .35s ease; }
+  .slot.active { outline: 4px solid #ffe14d; }
+  @keyframes pop { 0% { transform: scale(.85); } 70% { transform: scale(1.08); } 100% { transform: scale(1); } }
+  .now { margin-top: 18px; text-align: center; font-size: 24px; font-weight: 800; min-height: 32px; }
+  .now b { color: #ffe14d; }
+  .teams { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 18px; }
+  .team { background: #fff; color: #0b2160; border-radius: 14px; overflow: hidden; text-align: center; }
+  .team .h { color: #fff; font-weight: 900; padding: 8px 0; font-size: 17px; }
+  .team .lead { font-size: 22px; font-weight: 900; padding-top: 12px; }
+  .team .plus { font-size: 14px; color: #6b7ea6; }
+  .team .mate { font-size: 21px; font-weight: 900; color: #c0392b; padding: 4px 6px 14px; min-height: 44px; word-break: break-word; }
+  .team.rolling .mate { color: #8aa0c8; }
+  .team.done { animation: pop .35s ease; }
+  .center { text-align: center; }
+  .log { margin-top: 14px; font-size: 14px; color: #9fd4ff; text-align: center; }
+  @media (max-width: 760px) {
+    .inputs { grid-template-columns: repeat(2, 1fr); }
+    .order, .teams { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>BỐC THĂM – GIẢI <span class="y">PICKLEBALL</span> ĐÔI NAM</h1>
+  <div class="sub">12 NGƯỜI • 6 ĐỘI • BỐC THĂM 2 VÒNG</div>
+
+  <div class="card">
+    <div class="hd"><div class="tag">VÒNG 1</div>
+      <div class="ttl">Bốc thứ tự lượt bốc đội<small>Nhập tên 6 người bốc thăm, sau đó bấm nút để xác định thứ tự</small></div></div>
+    <div class="center"><button class="ghost" id="shuffleNames">🔀 RANDOM TÊN</button></div>
+    <div class="inputs" id="names"></div>
+    <div class="err" id="err1"></div>
+    <div class="center"><button id="btn1">🎲 BỐC THĂM VÒNG 1</button></div>
+    <div class="order" id="order"></div>
+  </div>
+
+  <div class="card">
+    <div class="hd"><div class="tag">VÒNG 2</div>
+      <div class="ttl">Lần lượt bốc đội<small>Theo thứ tự Vòng 1, mỗi người bấm bốc để ghép cặp với 1 đội</small></div></div>
+    <div class="now" id="now">Hoàn thành Vòng 1 để bắt đầu Vòng 2</div>
+    <div class="center"><button id="btn2" disabled>🎾 BỐC ĐỘI</button></div>
+    <div class="teams" id="teams"></div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div class="center"><button class="ghost" id="reset">↺ Làm lại từ đầu</button></div>
+</div>
+
+<script>
+const LEADERS = [
+  { team: "Đội 1", name: "Sơn",  color: "#e53935" },
+  { team: "Đội 2", name: "Thọ",  color: "#1e63e6" },
+  { team: "Đội 3", name: "Nam",  color: "#2e9e44" },
+  { team: "Đội 4", name: "Thân", color: "#8e3fd6" },
+  { team: "Đội 5", name: "Kỳ",   color: "#f57c00" },
+  { team: "Đội 6", name: "Ngọc", color: "#14a3b8" },
+];
+const DRAWERS = ["A Hiếu", "Vợ A Hiếu", "Hiếu Em", "Dũng", "Công", "A Cường"];
+const ROLL_MS = 1600, TICK_MS = 70;
+
+const $ = id => document.getElementById(id);
+let drawOrder = [], remainingTeams = [], turn = 0, busy = false;
+
+function randInt(max) {
+  const buf = new Uint32Array(1);
+  crypto.getRandomValues(buf);
+  return buf[0] % max;
+}
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) { const j = randInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function roll(onTick, onDone) {
+  const timer = setInterval(onTick, TICK_MS);
+  setTimeout(() => { clearInterval(timer); onDone(); }, ROLL_MS);
+}
+
+function render() {
+  $("names").innerHTML = Array.from({ length: 6 }, (_, i) =>
+    `<input id="n${i}" placeholder="Người bốc thăm ${i + 1}" value="${DRAWERS[i]}">`).join("");
+  $("order").innerHTML = Array.from({ length: 6 }, (_, i) =>
+    `<div class="slot" id="o${i}"><div class="n">LƯỢT ${i + 1}</div><div class="p">?</div></div>`).join("");
+  $("teams").innerHTML = LEADERS.map((l, i) =>
+    `<div class="team" id="t${i}"><div class="h" style="background:${l.color}">${l.team}</div>
+     <div class="lead">${l.name}</div><div class="plus">+</div><div class="mate">?</div></div>`).join("");
+}
+
+$("shuffleNames").onclick = () => {
+  if (busy || drawOrder.length) return;
+  const inputs = [...Array(6).keys()].map(i => $("n" + i));
+  const names = inputs.map(el => el.value);
+  busy = true;
+  roll(
+    () => inputs.forEach(el => el.value = names[randInt(6)]),
+    () => { shuffle(names).forEach((v, i) => inputs[i].value = v); busy = false; }
+  );
+};
+
+$("btn1").onclick = () => {
+  if (busy) return;
+  const names = Array.from({ length: 6 }, (_, i) => $("n" + i).value.trim());
+  if (names.some(n => !n)) { $("err1").textContent = "Vui lòng nhập đủ 6 tên."; return; }
+  if (new Set(names.map(n => n.toLowerCase())).size !== 6) { $("err1").textContent = "Tên bị trùng, vui lòng phân biệt."; return; }
+  $("err1").textContent = "";
+  busy = true; $("btn1").disabled = true;
+  names.forEach((_, i) => $("n" + i).disabled = true);
+  drawOrder = shuffle(names);
+  const slots = [...Array(6).keys()].map(i => $("o" + i));
+  slots.forEach(s => s.classList.add("rolling"));
+  roll(
+    () => slots.forEach(s => s.querySelector(".p").textContent = names[randInt(6)]),
+    () => {
+      slots.forEach((s, i) => {
+        s.classList.remove("rolling"); s.classList.add("done");
+        s.querySelector(".p").textContent = drawOrder[i];
+      });
+      busy = false;
+      remainingTeams = [...Array(6).keys()];
+      turn = 0;
+      startTurn();
+    }
+  );
+};
+
+function startTurn() {
+  document.querySelectorAll(".slot").forEach(s => s.classList.remove("active"));
+  if (turn >= 6) {
+    $("now").innerHTML = "🏆 <b>Hoàn tất bốc thăm!</b> Chúc các đội thi đấu hết mình!";
+    $("btn2").disabled = true;
+    return;
+  }
+  $("o" + turn).classList.add("active");
+  $("now").innerHTML = `Lượt ${turn + 1}: <b>${drawOrder[turn]}</b> lên bốc đội`;
+  $("btn2").disabled = false;
+}
+
+function clearPreview(idx) {
+  if (idx < 0) return;
+  const el = $("t" + idx);
+  el.classList.remove("rolling");
+  el.querySelector(".mate").textContent = el.dataset.mate || "?";
+}
+
+$("btn2").onclick = () => {
+  if (busy || turn >= 6) return;
+  busy = true; $("btn2").disabled = true;
+  const person = drawOrder[turn];
+  const candidates = [...remainingTeams];
+  const pick = remainingTeams.splice(randInt(remainingTeams.length), 1)[0];
+  let last = -1;
+  roll(
+    () => {
+      clearPreview(last);
+      last = candidates[randInt(candidates.length)];
+      const el = $("t" + last); el.classList.add("rolling"); el.querySelector(".mate").textContent = person;
+    },
+    () => {
+      clearPreview(last);
+      const el = $("t" + pick);
+      el.dataset.mate = person;
+      el.querySelector(".mate").textContent = person;
+      el.classList.add("done");
+      $("log").innerHTML += `${person} → ${LEADERS[pick].team} (${LEADERS[pick].name})<br>`;
+      turn++; busy = false;
+      startTurn();
+    }
+  );
+};
+
+$("reset").onclick = () => {
+  if (busy) return;
+  if (drawOrder.length && !confirm("Xoá kết quả và làm lại từ đầu?")) return;
+  const saved = Array.from({ length: 6 }, (_, i) => $("n" + i).value);
+  drawOrder = []; remainingTeams = []; turn = 0;
+  render();
+  saved.forEach((v, i) => $("n" + i).value = v);
+  $("btn1").disabled = false; $("btn2").disabled = true;
+  $("now").textContent = "Hoàn thành Vòng 1 để bắt đầu Vòng 2";
+  $("log").innerHTML = ""; $("err1").textContent = "";
+};
+
+render();
+</script>
+</body>
+</html>
